@@ -27,7 +27,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
   Member.associate = function(models) {
-  
   };
   return Member;
 };
