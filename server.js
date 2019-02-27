@@ -36,6 +36,7 @@ require('./routes/employee-route')(app)
 require('./routes/auth-route')(app)
 require('./routes/member-route')(app)
 require('./routes/books-route')(app)
+require('./routes/author-route')(app)
 
 
 
