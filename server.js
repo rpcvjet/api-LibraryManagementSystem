@@ -37,6 +37,7 @@ require('./routes/auth-route')(app)
 require('./routes/member-route')(app)
 require('./routes/books-route')(app)
 require('./routes/author-route')(app)
+require('./routes/shelf-route')(app)
 
 
 
