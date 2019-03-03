@@ -1,4 +1,6 @@
-const Books = require('../models').Books
+const Books = require('../models').Book
+const Author = require('../models').Author
+const shelfLocation = require('../models').shelfLocation
 
 
 module.exports = {
@@ -9,15 +11,19 @@ module.exports = {
             genre: req.body.genre,
             volume: req.body.volume,
             edition: req.body.edition,
-            publicationYear: req.body.publicationYear
-
+            publicationYear: req.body.publicationYear,
+            authorId: req.body.authorId,
+            shelfLocationId: req.body.shelfLocationId
             })
             .then(book => res.status(200).send(book))
             .catch(error => res.status(400).send(error))
     },
     getAll(req, res) {
         return Books.findAll({
-                model: Books,
+            //bring in other models here with include
+        include: [{
+           all: true
+        }]            
         })
         .then(books => res.status(200).send(books))
         .catch(error => res.status(400).send(error))

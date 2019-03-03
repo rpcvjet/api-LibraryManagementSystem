@@ -11,7 +11,9 @@ module.exports = (sequelize, DataTypes) => {
     } 
   }, {});
   shelfLocation.associate = function(models) {
-    // associations can be defined here
+    shelfLocation.hasMany(models.Book, {
+      foreignKey:'shelfLocationId'
+    })
   };
   return shelfLocation;
-};
+}; 

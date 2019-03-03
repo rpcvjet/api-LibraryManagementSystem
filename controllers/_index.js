@@ -8,7 +8,7 @@ module.exports = {
     location,
     employee,
     member,
-    books,
     author,
+    books,
     shelfLocation
 };
