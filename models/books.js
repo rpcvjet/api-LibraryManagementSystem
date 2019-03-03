@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const Books = sequelize.define('Books', {
+  const Book = sequelize.define('Book', {
 
     isbn: {
       type:DataTypes.STRING,
@@ -30,11 +30,18 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.BOOLEAN,
       defaultValue: true,
       allowNull: false
+    },
+    authorId : {
+      type:DataTypes.INTEGER,
+    },
+    shelfLocationId : {
+      type:DataTypes.INTEGER,
     }
     
   }, {});
-  Books.associate = function(models) {
-    // associations can be defined here
+  Book.associate = function(models) {
+    Book.belongsTo(models.Author)
+    Book.belongsTo(models.shelfLocation)
   };
-  return Books;
+  return Book;
 };

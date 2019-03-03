@@ -5,7 +5,6 @@ module.exports = {
     create(req, res) {
         return Author.create({
             name: req.body.name
-
             })
             .then(author => res.status(200).send(author))
             .catch(error => res.status(400).send(error))

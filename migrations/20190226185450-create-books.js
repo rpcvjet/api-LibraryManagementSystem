@@ -36,7 +36,23 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      }
+      },
+      authorId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Authors',
+          key: 'id',
+          as: 'authorId'
+        },
+      },
+      shelfLocationId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'shelfLocations',
+          key: 'id',
+          as: 'shelfLocationId'
+        },
+      },
     });
   },
   down: (queryInterface, Sequelize) => {
