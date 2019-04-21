@@ -8,7 +8,6 @@ const passport = require('passport');
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
 const localStrategy = require('passport-local');
-const Employee = require('../models').Employee
 
 
 const opts = {
@@ -19,6 +18,7 @@ const opts = {
 //used on protected routes
 passport.use('jwt',new JWTstrategy(opts, (jwt_payload, done) => {
       try {
+        TODO: //fix this
         Employee.findOne({
           where: {
             email: jwt_payload.id,

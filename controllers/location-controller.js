@@ -1,23 +1,22 @@
-const Location = require('../models').Location
-const Employee = require('../models').Employee;
+'use strict';
+
 
 module.exports = {
+
     create(req, res) {
-        return Location.create({
-                branch: req.body.branch,
-                address: req.body.address
-            })
-            .then(location => res.status(200).send(location))
-            .catch(error => res.status(400).send(error))
-    },
-    getAll(req, res) {
-        return Location.findAll({
-            include: [{
-                model: Employee,
-                as: 'employees'
-            }]
+        db.connection(function (err) {
+            if (err) throw err;
+
+            // const locationPost = function () {
+                db.query(sql, function (err, result) {
+                    if (err) throw err;
+                })
+                console.log('Number of affectedRow: ', result.affectedRows)
+            // }
         })
-        .then(location => res.status(200).send(location))
-        .catch(error => res.status(400).send(error))
+
+
     }
+
+
 }
