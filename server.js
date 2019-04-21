@@ -1,4 +1,5 @@
 'use strict';
+
 require('dotenv').config();
 const express = require('express');
 const logger = require('morgan');
@@ -8,13 +9,15 @@ const passport = require('passport');
 const sequelize = require('sequelize');
 const http = require('http');
 const session = require('express-session')
+const db = require('./config/db');
+
 const app = express();
 app.use(logger('dev'));
 
 app.use(cors());
 app.use(logger('dev'))
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 app.use(session({
@@ -31,13 +34,13 @@ app.use(passport.session());
 require('./config/passport');
 
 //routes
-require('./routes/location-route')(app)
-require('./routes/employee-route')(app)
-require('./routes/auth-route')(app)
-require('./routes/member-route')(app)
-require('./routes/books-route')(app)
-require('./routes/author-route')(app)
-require('./routes/shelf-route')(app)
+app.use(require('./routes/location-route'))
+app.use(require('./routes/employee-route'))
+// require('./routes/auth-route')(app)
+// require('./routes/member-route')(app)
+// require('./routes/books-route')(app)
+// require('./routes/author-route')(app)
+// require('./routes/shelf-route')(app)
 
 
 const port = parseInt(process.env.PORT, 10) || 8000;
