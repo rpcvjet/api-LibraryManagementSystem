@@ -4,22 +4,37 @@ const Router = require('express').Router;
 const BookRouter = module.exports = new Router();
 const bodyParser = require('body-parser').json();
 
-//add a book to the library
+//add a  new book to the library
 BookRouter.post('/api/book/add', bodyParser, (req, res, next) => {
-
-    const post = {
-        ISBN: req.body.ISBN,
-        title: req.body.title,
-        genre: req.body.genre,
-        volume: req.body.volume,
-        edition: req.body.edition,
-        publicationYear: req.body.publicationYear,
-        Available: req.body.Available,
-        Author_id: req.body.Author_id,
-        ShelfLocation_id: req.body.ShelfLocation_id
+   
+    const postAuthor = () => {
+        return new Promise((resolve, reject) => {
+            const author = {
+                name: req.body.name
+            }
+            const sql = "INSERT INTO Author SET ?"
+            db.query(sql, author, (err, results) => {
+                if (err) {
+                    reject(err)
+                }
+                resolve(results)
+                console.log(results.affectedRows + ' row was affected')
+            })
+        })
     }
 
-    const request = () => {
+    const request = (results) => {
+        const post = {
+            ISBN: req.body.ISBN,
+            title: req.body.title,
+            genre: req.body.genre,
+            volume: req.body.volume,
+            edition: req.body.edition,
+            publicationYear: req.body.publicationYear,
+            Available: req.body.Available,
+            Author_id: results.insertId,
+            ShelfLocation_id: req.body.ShelfLocation_id
+        }
         return new Promise((resolve, reject) => {
             const sql = "INSERT into Book SET ?"
             db.query(sql, post, (err, results) => {
@@ -32,9 +47,14 @@ BookRouter.post('/api/book/add', bodyParser, (req, res, next) => {
             })
         })
     }
-    request().then(content => {
-        res.json('Success')
-    }).catch(next)
+    postAuthor()
+        .then((results) => {
+            return request(results)
+        .then(content => {
+            res.json('Success')
+        })
+        .catch(next)
+    })
 })
 
 //get all books in library
