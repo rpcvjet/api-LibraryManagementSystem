@@ -6,7 +6,6 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
-const sequelize = require('sequelize');
 const http = require('http');
 const session = require('express-session')
 const db = require('./config/db');
@@ -34,14 +33,13 @@ app.use(passport.session());
 require('./config/passport');
 
 //routes
+app.use(require('./routes/author-route'))
+app.use(require('./routes/shelf-route'))
 app.use(require('./routes/location-route'))
 app.use(require('./routes/employee-route'))
-// require('./routes/auth-route')(app)
+app.use(require('./routes/books-route'))
+// app.use(require('./routes/auth-route'))
 // require('./routes/member-route')(app)
-// require('./routes/books-route')(app)
-// require('./routes/author-route')(app)
-// require('./routes/shelf-route')(app)
-
 
 const port = parseInt(process.env.PORT, 10) || 8000;
 app.set('port', port);
