@@ -38,8 +38,8 @@ app.use(require('./routes/shelf-route'))
 app.use(require('./routes/location-route'))
 app.use(require('./routes/employee-route'))
 app.use(require('./routes/books-route'))
+app.use(require('./routes/member-route'))
 // app.use(require('./routes/auth-route'))
-// require('./routes/member-route')(app)
 
 const port = parseInt(process.env.PORT, 10) || 8000;
 app.set('port', port);
