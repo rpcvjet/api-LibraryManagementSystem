@@ -73,3 +73,49 @@ MemberRouter.get('/api/member/:memberNumber', (req, res, next) => {
 
 })
 
+//get member by name
+TODO: //separate first and last name for easier search
+MemberRouter.get('/api/member/name/:name', (req, res, next) => {
+    let request = () => {
+        return new Promise((resolve, reject) => {
+            const name = req.params.name
+            const sql = "SELECT * FROM Member WHERE name = ?"
+            db.query(sql, name, (err, result) => {
+                if (err) (
+                    reject(err)
+                )
+                resolve(result)
+            })
+        })
+    }
+    request().then(content => {
+        res.json(content)
+    }).catch(next)
+
+})
+
+//get member by id
+
+MemberRouter.get('/api/member/userId/:id', (req, res, next) => {
+    let request = () => {
+        return new Promise((resolve, reject) => {
+            const id = req.params.id
+            const sql = "SELECT memberNumber, name, email, phone, dateAdded, image, checkedoutBooks FROM Member INNER JOIN Book ON Member.id = Book.Member_id  WHERE Member.id = ?"
+            db.query(sql, id, (err, result) => {
+                if (err) (
+                    reject(err)
+                )
+                resolve(result)
+            })
+        })
+    }
+    request().then(content => {
+        res.json(content)
+    }).catch(next)
+
+})
+
+
+
+
+
