@@ -94,13 +94,13 @@ MemberRouter.get('/api/member/name/:name', (req, res, next) => {
 
 })
 
-//get member by id
+//get all checked out books by user
 
 MemberRouter.get('/api/member/userId/:id', (req, res, next) => {
     let request = () => {
         return new Promise((resolve, reject) => {
             const id = req.params.id
-            const sql = "SELECT memberNumber, name, email, phone, dateAdded, image, checkedoutBooks FROM Member INNER JOIN Book ON Member.id = Book.Member_id  WHERE Member.id = ?"
+            const sql = "SELECT ISBN, genre, volume, edition, publicationYear, title from Book WHERE Member_id =?"
             db.query(sql, id, (err, result) => {
                 if (err) (
                     reject(err)

@@ -160,3 +160,41 @@ BookRouter.put('/api/book/checkout',bodyParser, (req, res, next) => {
     }).catch(next)
 
 })
+//get all checked out books
+BookRouter.get('/api/book/notavailable', (req, res, next) => {
+    let request = () => {
+        const available = false
+        return new Promise((resolve, reject) => {  
+            const sql = "SELECT title, ISBN,genre, volume, edition, publicationYear, name as Author from Book INNER JOIN Author ON Author_id = Author.id WHERE Available = ?"
+            db.query(sql, available,(err, result) => {
+                if (err) (
+                    reject(err)
+                )
+                resolve(result)
+            })
+        })
+    }
+    request().then(content => {
+        res.json(content)
+    }).catch(next)
+
+})
+
+BookRouter.get('/api/book/available', (req, res, next) => {
+    let request = () => {
+        const available = true
+        return new Promise((resolve, reject) => {  
+            const sql = "SELECT * from Book INNER JOIN ShelfLocation ON ShelfLocation.id = Book.ShelfLocation_id INNER JOIN Author ON Author_id = Author.id  WHERE Available = ?"
+            db.query(sql, available,(err, result) => {
+                if (err) (
+                    reject(err)
+                )
+                resolve(result)
+            })
+        })
+    }
+    request().then(content => {
+        res.json(content)
+    }).catch(next)
+
+})
