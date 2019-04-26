@@ -61,7 +61,7 @@ BookRouter.post('/api/book/add', bodyParser, (req, res, next) => {
 BookRouter.get('/api/books/getAll', (req, res, next) => {
     const request = () => {
         return new Promise((resolve, reject) => {
-            const sql = "SELECT ISBN, title, genre, volume, edition, publicationYear, Available, Shelf_name as Shelf, description as Shelf_description, name as Author from Book INNER JOIN Author ON Author.id = Book.Author_Id INNER JOIN ShelfLocation ON ShelfLocation.id = Book.ShelfLocation_Id"
+            const sql = "SELECT ISBN, title, genre, volume, edition, publicationYear, Available, Member_id, Shelf_name as Shelf, description as Shelf_description, name as Author from Book INNER JOIN Author ON Author.id = Book.Author_Id INNER JOIN ShelfLocation ON ShelfLocation.id = Book.ShelfLocation_Id"
             db.query(sql, (err, results) => {
                 if (err) {
                     console.log('err', err)
@@ -134,4 +134,67 @@ BookRouter.get('/api/books/:id', (req, res, next) => {
     request().then(content => {
         res.json(content)
     }).catch(next)
+})
+
+//Checkout a book to a member
+BookRouter.put('/api/book/checkout',bodyParser, (req, res, next) => {
+    console.log(req.body)
+    let request = () => {
+        return new Promise((resolve, reject) => {
+            const Update = [
+                req.body.Member_id,
+                req.body.Available,
+                req.body.id
+            ]
+            const sql = "UPDATE Book SET Member_id = ?, Available = ? WHERE id =?"
+            db.query(sql, Update, (err, result) => {
+                if (err) (
+                    reject(err)
+                )
+                resolve(result)
+            })
+        })
+    }
+    request().then(content => {
+        res.json(content)
+    }).catch(next)
+
+})
+//get all checked out books
+BookRouter.get('/api/book/notavailable', (req, res, next) => {
+    let request = () => {
+        const available = false
+        return new Promise((resolve, reject) => {  
+            const sql = "SELECT title, ISBN,genre, volume, edition, publicationYear, name as Author from Book INNER JOIN Author ON Author_id = Author.id WHERE Available = ?"
+            db.query(sql, available,(err, result) => {
+                if (err) (
+                    reject(err)
+                )
+                resolve(result)
+            })
+        })
+    }
+    request().then(content => {
+        res.json(content)
+    }).catch(next)
+
+})
+
+BookRouter.get('/api/book/available', (req, res, next) => {
+    let request = () => {
+        const available = true
+        return new Promise((resolve, reject) => {  
+            const sql = "SELECT * from Book INNER JOIN ShelfLocation ON ShelfLocation.id = Book.ShelfLocation_id INNER JOIN Author ON Author_id = Author.id  WHERE Available = ?"
+            db.query(sql, available,(err, result) => {
+                if (err) (
+                    reject(err)
+                )
+                resolve(result)
+            })
+        })
+    }
+    request().then(content => {
+        res.json(content)
+    }).catch(next)
+
 })
