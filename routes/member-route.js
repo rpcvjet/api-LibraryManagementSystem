@@ -7,14 +7,13 @@ const bodyParser = require('body-parser').json();
 
 //add a new member to the library
 MemberRouter.post('/api/member/add', bodyParser, (req, res, next) => {
-    console.log('req', req.body)
     let request = () => {
         return new Promise((resolve, reject) => {
 
             const today = new Date().toISOString().slice(0,10)
             let post = {
                 memberNumber: req.body.memberNumber,
-                name: req.body.name,
+                member_name: req.body.member_name,
                 email: req.body.email,
                 phone: req.body.phone,
                 dateAdded: today,
@@ -79,7 +78,7 @@ MemberRouter.get('/api/member/name/:name', (req, res, next) => {
     let request = () => {
         return new Promise((resolve, reject) => {
             const name = req.params.name
-            const sql = "SELECT * FROM Member WHERE name = ?"
+            const sql = "SELECT * FROM Member WHERE member_name = ?"
             db.query(sql, name, (err, result) => {
                 if (err) (
                     reject(err)

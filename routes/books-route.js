@@ -3,6 +3,8 @@ const db = require('../config/db')
 const Router = require('express').Router;
 const BookRouter = module.exports = new Router();
 const bodyParser = require('body-parser').json();
+const circulation = require('../lib/libs');
+
 
 //add a  new book to the library
 BookRouter.post('/api/book/add', bodyParser, (req, res, next) => {
@@ -138,7 +140,7 @@ BookRouter.get('/api/books/:id', (req, res, next) => {
 
 //Checkout a book to a member
 BookRouter.put('/api/book/checkout',bodyParser, (req, res, next) => {
-    console.log(req.body)
+
     let request = () => {
         return new Promise((resolve, reject) => {
             const Update = [
@@ -155,11 +157,40 @@ BookRouter.put('/api/book/checkout',bodyParser, (req, res, next) => {
             })
         })
     }
+    request().then((content) => {
+        return circulation.circulationInsert(req.body.id, 2, req.body.Member_id)
+    }).then(content => {
+        res.json(content)
+    }).catch(next)
+
+})
+//checkIN book to the library
+BookRouter.put('/api/book/checkin',bodyParser, (req, res, next) => {
+    const Available = true;
+    const Member_id = null
+    let request = () => {
+        return new Promise((resolve, reject) => {
+            const Update = [
+                Member_id,
+                Available,
+                req.body.id
+            ]
+            const sql = "UPDATE Book SET Member_id = ?, Available = ? WHERE id =?"
+            db.query(sql, Update, (err, result) => {
+                if (err) (
+                    reject(err)
+                )
+                resolve(result)
+            })
+        })
+    }
     request().then(content => {
         res.json(content)
     }).catch(next)
 
 })
+
+
 //get all checked out books
 BookRouter.get('/api/book/notavailable', (req, res, next) => {
     let request = () => {
@@ -180,6 +211,7 @@ BookRouter.get('/api/book/notavailable', (req, res, next) => {
 
 })
 
+//get all books that are available
 BookRouter.get('/api/book/available', (req, res, next) => {
     let request = () => {
         const available = true

@@ -9,7 +9,7 @@ const bodyParser = require('body-parser').json();
 employeeRouter.post('/api/postEmployee', bodyParser, (req, res, next) => {
     const post = {
         employee_id: req.body.employee_id,
-        name: req.body.name,
+        employee_name: req.body.employee_name,
         password: req.body.password,
         email: req.body.email,
         Location_id: req.body.Location_id
@@ -35,7 +35,7 @@ employeeRouter.post('/api/postEmployee', bodyParser, (req, res, next) => {
 employeeRouter.get('/api/getEmployees', (req, res, next) => {
     const request = () => {
         return new Promise((resolve, reject) => {
-            const sql = "SELECT name, email, employee_id, branch_name, address from Employee INNER JOIN Location ON Location.id = Employee.Location_id"
+            const sql = "SELECT employee_name, email, employee_id, branch_name, address from Employee INNER JOIN Location ON Location.id = Employee.Location_id"
             db.query(sql, (err, results) => {
                 if (err) reject(err)
                 resolve(results)
@@ -52,7 +52,7 @@ employeeRouter.get('/api/getEmployees/:id', (req, res, next) => {
     const request = () => {
         return new Promise((resolve, reject) => {
             let id = req.params.id;
-            const sql = "SELECT name, email, employee_id, branch_name, address from Employee INNER JOIN Location ON Location.id =Employee.Location_id WHERE Employee.id=?";
+            const sql = "SELECT employee_name, email, employee_id, branch_name, address from Employee INNER JOIN Location ON Location.id =Employee.Location_id WHERE Employee.id=?";
             db.query(sql, id, (err, results) => {
                 if (err) reject(err)
                 resolve(results)
@@ -69,7 +69,7 @@ employeeRouter.get('/api/employee/location/:id', (req, res, next) => {
     const request = () => {
         return new Promise((resolve, reject) => {
             let id = req.params.id;
-            const sql = "SELECT name, email, employee_id from Employee WHERE Location_id=?";
+            const sql = "SELECT employee_name, email, employee_id from Employee WHERE Location_id=?";
             db.query(sql, id, (err, results) => {
                 if (err) reject(err)
                 resolve(results)
