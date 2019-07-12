@@ -78,6 +78,27 @@ BookRouter.get('/api/books/getAll', (req, res, next) => {
     }).catch(next)
 })
 
+BookRouter.get('/api/books/:search', (req, res, next) => {
+    const request = () => {
+        return new Promise((resolve, reject) => {
+            const search =  req.params.search
+            const sql = "SELECT Books.id,title,isbn,genre,volume,edition,publicationyear, dateadded, name, description FROM Books INNER JOIN Author ON Author_id = Author.id WHERE concat(title, '', name, '', isbn, '') LIKE '%' ? '%' "
+            db.query(sql, search, (err, results) => {
+                if (err) {
+                    console.log('err', err)
+                    reject(err)
+                }
+                resolve(results)
+            })
+        })
+    }
+    request().then(content => {
+        res.json(content)
+    }).catch(next)
+})
+
+
+
 //get all books by genre
 BookRouter.get('/api/books/genre/:genre', (req, res, next) => {
     const request = () => {
@@ -103,7 +124,7 @@ BookRouter.get('/api/books/isbn/:ISBN', (req, res, next) => {
     const request = () => {
         return new Promise((resolve, reject) => {
             const ISBN = req.params.ISBN
-            const sql = "SELECT ISBN, title, genre, volume, edition, publicationYear, Available, Shelf_name as Shelf, description as Shelf_description, name as Author from Book INNER JOIN Author ON Author.id = Book.Author_Id INNER JOIN ShelfLocation ON ShelfLocation.id = Book.ShelfLocation_Id WHERE ISBN = ?"
+            const sql = "SELECT ISBN, title, genre, volume, edition, publicationYear, Available, Shelf_name as Shelf, description as Shelf_description, name as Author from Books INNER JOIN Author ON Author.id = Book.Author_Id INNER JOIN Shelf_Location ON Shelf_Location.id = Book.Shelf_Location_Id WHERE ISBN = ?"
             db.query(sql, ISBN, (err, results) => {
                 if (err) {
                     console.log('err', err)
@@ -119,11 +140,11 @@ BookRouter.get('/api/books/isbn/:ISBN', (req, res, next) => {
 })
 
 //get a book by id
-BookRouter.get('/api/books/:id', (req, res, next) => {
+BookRouter.get('/api/books/BookId/:id', (req, res, next) => {
     const request = () => {
         return new Promise((resolve, reject) => {
             const id = req.params.id
-            const sql = "SELECT ISBN, title, genre, volume, edition, publicationYear, Available, Shelf_name as Shelf, description as Shelf_description, name as Author from Book INNER JOIN Author ON Author.id = Book.Author_Id INNER JOIN ShelfLocation ON ShelfLocation.id = Book.ShelfLocation_Id WHERE Book.id = ?"
+            const sql = "SELECT isbn, description, image, shelf_name, shelf_description, title, genre, volume, edition, publicationyear, available, Author.name as Author from Books INNER JOIN Author ON Author.id = Books.Author_Id INNER JOIN Shelf_Location ON Shelf_Location.id = Books.Shelf_Location_Id WHERE Books.id = ?"
             db.query(sql, id, (err, results) => {
                 if (err) {
                     console.log('err', err)
@@ -143,6 +164,7 @@ BookRouter.put('/api/book/checkout',bodyParser, (req, res, next) => {
 
     let request = () => {
         return new Promise((resolve, reject) => {
+            //Updates must be arrays
             const Update = [
                 req.body.Member_id,
                 req.body.Available,
@@ -189,7 +211,6 @@ BookRouter.put('/api/book/checkin',bodyParser, (req, res, next) => {
     }).catch(next)
 
 })
-
 
 //get all checked out books
 BookRouter.get('/api/book/notavailable', (req, res, next) => {
