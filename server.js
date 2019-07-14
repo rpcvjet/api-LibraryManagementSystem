@@ -9,6 +9,7 @@ const passport = require('passport');
 const http = require('http');
 const session = require('express-session')
 const db = require('./config/db');
+const fb = require('./config/fb');
 
 const app = express();
 app.use(logger('dev'));

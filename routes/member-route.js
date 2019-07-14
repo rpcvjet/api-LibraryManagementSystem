@@ -29,6 +29,14 @@ MemberRouter.post('/api/member/add', bodyParser, (req, res, next) => {
             })
         })
     }
+
+    let sendToFirebase = () => {
+        return new Promise((resolve, reject) => {
+            
+        })
+    }
+
+
     request().then(content => {
         res.json('Success')
     }).catch(next)
