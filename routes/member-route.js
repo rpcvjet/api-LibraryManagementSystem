@@ -1,47 +1,103 @@
 'use strict';
 const db = require('../config/db')
+const helpers = require('../config/lib');
+const path = require('path');
 const Router = require('express').Router;
+const Multer = require('multer');
 const MemberRouter = module.exports = new Router();
 const bodyParser = require('body-parser').json();
+const { createWriteStream } = require("fs");
 
+const {gc} = helpers
+
+const multer = Multer({
+    storage: Multer.MemoryStorage,
+    limits: {
+      fileSize: 10 * 1024 * 1024, // Maximum file size is 10MB
+    },
+  });
 
 //add a new member to the library
-MemberRouter.post('/api/member/add', bodyParser, (req, res, next) => {
-    let request = () => {
-        return new Promise((resolve, reject) => {
+MemberRouter.post('/api/member/add', bodyParser, multer.single('image'), (req, res, next) => {
 
-            const today = new Date().toISOString().slice(0,10)
-            let post = {
-                memberNumber: req.body.memberNumber,
-                member_name: req.body.member_name,
-                email: req.body.email,
-                phone: req.body.phone,
-                dateAdded: today,
-                image: req.body.image,
-            }
-            const sql = "INSERT INTO Members SET ?"
-            db.query(sql, post, (err, result) => {
-                console.log('post', post)
-                if (err) (
-                    reject(err)
-                )
-                resolve(result)
-            })
-        })
-    }
-
-    let sendToFirebase = () => {
+    let fileUpload = () => {
         return new Promise((resolve, reject) => {
+            const bucketName = process.env.STORAGE;
+            const bucket = helpers.pictureBucket;
+            const gcsFileName = `${Date.now()}-${req.file.originalname}`;
+            const fileName =  helpers.pictureBucket.file(gcsFileName);
+
+            const stream = fileName.createWriteStream({
+                resumable: false,
+                gzip: true,
+                metadata: {
+                  contentType: req.file.mimetype,
+                },
+              });
             
+              stream.on('error', (err) => {         
+                req.file.cloudStorageError = err;
+                reject(err)
+                console.log('upload error-->', err)
+                next(err);
+              });
+
+              stream.on('finish', () => {
+                  
+                req.file.cloudStorageObject = gcsFileName;
+            
+                return fileName.makePublic()
+                .then(() => {
+                    req.file.gcsUrl = helpers.getPublicUrl = (bucketName, fileName);
+                    resolve(`https://storage.googleapis.com/${bucketName}/${gcsFileName}`)
+                    next();
+                 });
+              });
+            
+              stream.end(req.file.buffer);
         })
     }
 
 
-    request().then(content => {
-        res.json('Success')
+    // if (req.file && req.file.gcsUrl) {
+    //     return res.send(req.file.gcsUrl);
+    //   }
+  
+    //   return res.status(500).send('Unable to upload');
+ 
+    // let request = () => {
+    //     return new Promise((resolve, reject) => {
+
+    //         const today = new Date().toISOString().slice(0,10)
+    //         let post = {
+    //             memberNumber: req.body.memberNumber,
+    //             member_name: req.body.member_name,
+    //             email: req.body.email,
+    //             phone: req.body.phone,
+    //             dateAdded: today,
+    //             image: req.body.image,
+    //         }
+    //         const sql = "INSERT INTO Members SET ?"
+    //         db.query(sql, post, (err, result) => {
+    //             console.log('post', post)
+    //             if (err) (
+    //                 reject(err)
+    //             )
+    //             resolve(result)
+    //         })
+    //     })
+    // }
+    fileUpload().then(content => {
+        console.log('content', content)
+        res.status(200);
+        res.json(content)
     }).catch(next)
 
 })
+
+
+
+
 //get all members
 MemberRouter.get('/api/member/all', (req, res, next) => {
     let request = () => {
