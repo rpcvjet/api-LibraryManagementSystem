@@ -7,7 +7,7 @@ const Multer = require('multer');
 const MemberRouter = module.exports = new Router();
 const bodyParser = require('body-parser').json();
 const { createWriteStream } = require("fs");
-
+//const upload = multer()
 const {gc} = helpers
 
 const multer = Multer({
@@ -19,7 +19,7 @@ const multer = Multer({
 
 //add a new member to the library
 MemberRouter.post('/api/member/add', bodyParser, multer.single('image'), (req, res, next) => {
-
+    console.log(req.file)
     let fileUpload = () => {
         return new Promise((resolve, reject) => {
             const bucketName = process.env.STORAGE;
@@ -39,17 +39,17 @@ MemberRouter.post('/api/member/add', bodyParser, multer.single('image'), (req, r
                 req.file.cloudStorageError = err;
                 reject(err)
                 console.log('upload error-->', err)
-                next(err);
+                return res.status(500).send('Unable to upload');
+
               });
 
-              stream.on('finish', () => {
-                  
-                req.file.cloudStorageObject = gcsFileName;
-            
+              stream.on('finish', () => {           
+                req.file.cloudStorageObject = gcsFileName;    
                 return fileName.makePublic()
                 .then(() => {
                     req.file.gcsUrl = helpers.getPublicUrl = (bucketName, fileName);
-                    resolve(`https://storage.googleapis.com/${bucketName}/${gcsFileName}`)
+                    const results = `https://storage.googleapis.com/${bucketName}/${gcsFileName}`
+                    resolve(results)
                     next();
                  });
               });
@@ -63,34 +63,36 @@ MemberRouter.post('/api/member/add', bodyParser, multer.single('image'), (req, r
     //     return res.send(req.file.gcsUrl);
     //   }
   
-    //   return res.status(500).send('Unable to upload');
  
-    // let request = () => {
-    //     return new Promise((resolve, reject) => {
+    let request = (link) => {
+        return new Promise((resolve, reject) => {
 
-    //         const today = new Date().toISOString().slice(0,10)
-    //         let post = {
-    //             memberNumber: req.body.memberNumber,
-    //             member_name: req.body.member_name,
-    //             email: req.body.email,
-    //             phone: req.body.phone,
-    //             dateAdded: today,
-    //             image: req.body.image,
-    //         }
-    //         const sql = "INSERT INTO Members SET ?"
-    //         db.query(sql, post, (err, result) => {
-    //             console.log('post', post)
-    //             if (err) (
-    //                 reject(err)
-    //             )
-    //             resolve(result)
-    //         })
-    //     })
-    // }
-    fileUpload().then(content => {
-        console.log('content', content)
-        res.status(200);
-        res.json(content)
+            const today = new Date().toISOString().slice(0,10)
+            let post = {
+                memberNumber: req.body.memberNumber,
+                member_name: req.body.member_name,
+                email: req.body.email,
+                phone: req.body.phone,
+                dateAdded: today,
+                image: link,
+            }
+            const sql = "INSERT INTO Members SET ?"
+            db.query(sql, post, (err, result) => {
+                console.log('post', post)
+                if (err) (
+                    reject(err)
+                )
+                resolve(result)
+            })
+        })
+    }
+
+    fileUpload()
+        .then((link) => {
+            return request(link)
+        .then(content => {
+            res.status(200);
+        })
     }).catch(next)
 
 })
