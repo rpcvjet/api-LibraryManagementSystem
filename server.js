@@ -10,6 +10,7 @@ const http = require('http');
 const session = require('express-session')
 const db = require('./config/db');
 
+const gc = require('./config/lib')
 const app = express();
 app.use(logger('dev'));
 
