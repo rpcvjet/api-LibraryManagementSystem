@@ -153,7 +153,7 @@ typings/
 npm-debug.log
 testem.log
 /typings
-librarystorage-2211a-firebase-adminsdk-tkpi1-68a48de734.json
+config/librarystorage-2211a-firebase-adminsdk-tkpi1-68a48de734.json
 
 # e2e
 /e2e/*.js
